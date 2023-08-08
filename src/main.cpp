@@ -3,7 +3,7 @@
 #include "virtmic.h"
 
 #ifdef KXMLGUI
-#include <KAboutData>
+  #include <KAboutData>
 #endif
 
 #include <QApplication>

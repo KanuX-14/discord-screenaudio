@@ -11,7 +11,7 @@
 #include <QTimer>
 
 #ifdef KXMLGUI
-#include <KActionCollection>
+  #include <KActionCollection>
 #endif
 
 UserScript::UserScript() : QObject() {
@@ -54,30 +54,30 @@ void UserScript::setupHelpMenu() {
 
 void UserScript::setupShortcutsDialog() {
 #ifdef KXMLGUI
-#ifdef KGLOBALACCEL
-  m_kglobalaccel = true;
+  #ifdef KGLOBALACCEL
+    m_kglobalaccel = true;
 
-  auto toggleMuteAction = new QAction(this);
-  toggleMuteAction->setText("Toggle Mute");
-  toggleMuteAction->setIcon(QIcon::fromTheme("microphone-sensitivity-muted"));
-  connect(toggleMuteAction, &QAction::triggered, this,
-          &UserScript::muteToggled);
+    auto toggleMuteAction = new QAction(this);
+    toggleMuteAction->setText("Toggle Mute");
+    toggleMuteAction->setIcon(QIcon::fromTheme("microphone-sensitivity-muted"));
+    connect(toggleMuteAction, &QAction::triggered, this,
+            &UserScript::muteToggled);
 
-  auto toggleDeafenAction = new QAction(this);
-  toggleDeafenAction->setText("Toggle Deafen");
-  toggleDeafenAction->setIcon(QIcon::fromTheme("audio-volume-muted"));
-  connect(toggleDeafenAction, &QAction::triggered, this,
-          &UserScript::deafenToggled);
+    auto toggleDeafenAction = new QAction(this);
+    toggleDeafenAction->setText("Toggle Deafen");
+    toggleDeafenAction->setIcon(QIcon::fromTheme("audio-volume-muted"));
+    connect(toggleDeafenAction, &QAction::triggered, this,
+            &UserScript::deafenToggled);
 
-  m_actionCollection = new KActionCollection(this);
-  m_actionCollection->addAction("toggleMute", toggleMuteAction);
-  KGlobalAccel::setGlobalShortcut(toggleMuteAction, QList<QKeySequence>{});
-  m_actionCollection->addAction("toggleDeafen", toggleDeafenAction);
-  KGlobalAccel::setGlobalShortcut(toggleDeafenAction, QList<QKeySequence>{});
+    m_actionCollection = new KActionCollection(this);
+    m_actionCollection->addAction("toggleMute", toggleMuteAction);
+    KGlobalAccel::setGlobalShortcut(toggleMuteAction, QList<QKeySequence>{});
+    m_actionCollection->addAction("toggleDeafen", toggleDeafenAction);
+    KGlobalAccel::setGlobalShortcut(toggleDeafenAction, QList<QKeySequence>{});
 
-  m_shortcutsDialog = new KShortcutsDialog(KShortcutsEditor::GlobalAction);
-  m_shortcutsDialog->addCollection(m_actionCollection);
-#endif
+    m_shortcutsDialog = new KShortcutsDialog(KShortcutsEditor::GlobalAction);
+    m_shortcutsDialog->addCollection(m_actionCollection);
+  #endif
 #endif
 }
 
@@ -120,14 +120,14 @@ void UserScript::log(QString message) {
 
 void UserScript::showShortcutsDialog() {
 #ifdef KXMLGUI
-#ifdef KGLOBALACCEL
-  m_shortcutsDialog->show();
-#else
-  QMessageBox::information(MainWindow::instance(), "discord-screenaudio",
-                           "Keybinds are not supported on this platform "
-                           "(KGlobalAccel is not available).",
-                           QMessageBox::Ok);
-#endif
+  #ifdef KGLOBALACCEL
+    m_shortcutsDialog->show();
+  #else
+    QMessageBox::information(MainWindow::instance(), "discord-screenaudio",
+                            "Keybinds are not supported on this platform "
+                            "(KGlobalAccel is not available).",
+                            QMessageBox::Ok);
+  #endif
 #else
   QMessageBox::information(MainWindow::instance(), "discord-screenaudio",
                            "Keybinds are not supported on this platform "

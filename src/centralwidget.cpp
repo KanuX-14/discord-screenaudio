@@ -26,7 +26,7 @@ void CentralWidget::setupWebView() {
                            ->settings()
                            ->value("useNotifySend", false)
                            .toBool();
-  if (m_useKF5Notifications || useNotifySend)
+  if (bUseQtNotificationDaemon || useNotifySend)
     QWebEngineProfile::defaultProfile()->setNotificationPresenter(
         [&](std::unique_ptr<QWebEngineNotification> notificationInfo) {
           if (useNotifySend) {
@@ -38,8 +38,9 @@ void CentralWidget::setupWebView() {
             QProcess::execute("notify-send",
                               {"--icon", image_path, "--app-name",
                                "discord-screenaudio", title, message});
-          } else if (m_useKF5Notifications) {
+          }
 #ifdef KNOTIFICATIONS
+          else if (bUseQtNotificationDaemon) {
             KNotification *notification =
                 new KNotification("discordNotification");
             notification->setTitle(notificationInfo->title());
@@ -54,8 +55,8 @@ void CentralWidget::setupWebView() {
                       activateWindow();
                     });
             notification->sendEvent();
-#endif
           }
+#endif
         });
 
   connect(page->userScript(), &UserScript::loadingMessageChanged, this,

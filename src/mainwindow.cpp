@@ -2,7 +2,7 @@
 #include "virtmic.h"
 
 #ifdef KNOTIFICATIONS
-#include <KNotification>
+  #include <KNotification>
 #endif
 
 #include <QApplication>
