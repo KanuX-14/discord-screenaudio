@@ -1,0 +1,14 @@
+/* SPDX-FileCopyrightText: 2022 Malte Jürgens and contributors
+
+SPDX-License-Identifier: GPL-3.0-or-later */
+
+.vc-themes,
+.vc-cloud,
+.vc-backup-restore {
+  display: none;
+}
+
+/* The round buttons in the voice chat interface */
+.wrapper__4d4fe > div > div > .controlButton__863c7 {
+  display: none;
+}

@@ -1,10 +1,10 @@
+// SPDX-FileCopyrightText: 2022 Malte Jürgens and contributors
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "localserver.h"
 #include "mainwindow.h"
 #include "virtmic.h"
-
-#ifdef KXMLGUI
-  #include <KAboutData>
-#endif
 
 #include <QApplication>
 #include <QCommandLineParser>

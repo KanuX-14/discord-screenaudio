@@ -1,6 +1,12 @@
+// SPDX-FileCopyrightText: 2022 Malte Jürgens and contributors
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #pragma once
 
+#include "streamdialog.h"
 #include "userscript.h"
+#include "virtmic.h"
 
 #include <QDir>
 #include <QFile>
@@ -29,6 +35,7 @@ private:
   void setupPermissions();
   void setupUserStyles();
   void setupArrpc();
+  static void readAndAppendJsFile(const QString &path, QByteArray &data);
   void fetchUserStyles();
   bool acceptNavigationRequest(const QUrl &url,
                                QWebEnginePage::NavigationType type,

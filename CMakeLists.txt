@@ -1,4 +1,8 @@
-cmake_minimum_required(VERSION 3.0)
+# SPDX-FileCopyrightText: 2022 Malte Jürgens and contributors
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+cmake_minimum_required(VERSION 3.5)
 project(discord-screenaudio)
 
 include(version.cmake)
@@ -10,30 +14,23 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 string(TIMESTAMP TIMESTAMP %s)
 # set(CMAKE_AUTOUIC ON)
 
-find_package(Qt5 COMPONENTS Widgets)
-if (Qt5_FOUND)
-  find_package(Qt5 CONFIG REQUIRED COMPONENTS Widgets WebEngineWidgets)
+option(PREFER_QT5 "Prefer Qt5 over Qt6" OFF)
+option(SKIP_KDE "Do not include features requiring KDE Frameworks (notifications, global shortcuts)" OFF)
 
-#   find_package(KF5Notifications)
-#   if(KF5Notifications_FOUND)
-#     add_definitions( -DKNOTIFICATIONS )
-#   endif()
-
-#   find_package(KF5XmlGui)
-#   if(KF5XmlGui_FOUND)
-#     add_definitions( -DKXMLGUI )
-#   endif()
-
-#   find_package(KF5GlobalAccel)
-#   if(KF5GlobalAccel_FOUND)
-#     add_definitions( -DKGLOBALACCEL )
-#   endif()
-else()
-  message(WARNING "Qt 5 was not found on your system and Qt 6 will be used. You will not be able to use any features using KDE Frameworks.")
+if(NOT PREFER_QT5)
+  find_package(Qt6 COMPONENTS Widgets QUIET)
+endif()
+if (Qt6_FOUND)
   find_package(Qt6 CONFIG REQUIRED COMPONENTS Widgets WebEngineWidgets)
+  message(STATUS "Using Qt6")
+else()
+  find_package(Qt5 CONFIG REQUIRED COMPONENTS Widgets WebEngineWidgets)
+  message(STATUS "Using Qt5")
+  add_definitions( -DQT5 )
 endif()
 
 set(discord-screenaudio_SRC
@@ -68,22 +65,11 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/submodules/rohrkabel/CMakeLists.txt")
   message(FATAL_ERROR "Rohrkabel was not found since you are not in a Git checkout or have GIT_SUBMODULE disabled. Please provide rohrkabel manually to `./submodules/rohrkabel`.")
 endif()
 
-add_subdirectory(submodules/rohrkabel)
+add_subdirectory(submodules/rohrkabel EXCLUDE_FROM_ALL)
 
 add_executable(discord-screenaudio ${discord-screenaudio_SRC})
 
 target_link_libraries(discord-screenaudio Qt::Widgets Qt::WebEngineWidgets rohrkabel)
-
-# if(KF5Notifications_FOUND)
-#   target_link_libraries(discord-screenaudio KF5::Notifications)
-#   install(FILES assets/discord-screenaudio.notifyrc DESTINATION ${CMAKE_INSTALL_PREFIX}/share/knotifications5)
-# endif()
-# if(KF5XmlGui_FOUND)
-#   target_link_libraries(discord-screenaudio KF5::XmlGui)
-# endif()
-# if(KF5GlobalAccel_FOUND)
-#   target_link_libraries(discord-screenaudio KF5::GlobalAccel)
-# endif()
 
 install(TARGETS discord-screenaudio DESTINATION bin)
 install(FILES assets/de.shorsh.discord-screenaudio.png DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/256x256/apps)

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2022 Malte Jürgens and contributors
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "centralwidget.h"
 #include "discordpage.h"
 #include "mainwindow.h"
@@ -11,7 +15,7 @@
 CentralWidget::CentralWidget(QWidget *parent) : QWidget(parent) {
   setStyleSheet("background-color:#313338;");
   m_layout = new QVBoxLayout(this);
-  m_layout->setMargin(0);
+  m_layout->setContentsMargins(0, 0, 0, 0);
   m_layout->setSpacing(0);
   setupWebView();
 }
@@ -38,26 +42,7 @@ void CentralWidget::setupWebView() {
             QProcess::execute("notify-send",
                               {"--icon", image_path, "--app-name",
                                "discord-screenaudio", title, message});
-          }
-#ifdef KNOTIFICATIONS
-          else if (bUseQtNotificationDaemon) {
-            KNotification *notification =
-                new KNotification("discordNotification");
-            notification->setTitle(notificationInfo->title());
-            notification->setText(notificationInfo->message());
-            notification->setPixmap(
-                QPixmap::fromImage(notificationInfo->icon()));
-            notification->setDefaultAction("View");
-            connect(notification, &KNotification::defaultActivated,
-                    [&, notificationInfo = std::move(notificationInfo)]() {
-                      notificationInfo->click();
-                      show();
-                      activateWindow();
-                    });
-            notification->sendEvent();
-          }
-#endif
-        });
+          }});
 
   connect(page->userScript(), &UserScript::loadingMessageChanged, this,
           &CentralWidget::setLoadingIndicator);

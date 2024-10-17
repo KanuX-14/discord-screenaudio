@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2022 Malte Jürgens and contributors
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "discordpage.h"
 #include "log.h"
 #include "mainwindow.h"
@@ -16,7 +20,8 @@
 #include <QWebEngineScriptCollection>
 #include <QWebEngineSettings>
 
-DiscordPage::DiscordPage(QWidget *parent) : QWebEnginePage(parent) {
+DiscordPage::DiscordPage(QWidget *parent)
+    : QWebEnginePage(new QWebEngineProfile("discord-screenaudio"), parent) {
   setBackgroundColor(QColor("#313338"));
 
   connect(this, &QWebEnginePage::featurePermissionRequested, this,
@@ -34,16 +39,39 @@ DiscordPage::DiscordPage(QWidget *parent) : QWebEnginePage(parent) {
   setWebChannel(new QWebChannel(this));
   webChannel()->registerObject("userscript", &m_userScript);
 
-  injectFile(&DiscordPage::injectScript, "userscript.js",
-             ":/assets/userscript.js");
+  QByteArray content;
+  readAndAppendJsFile(":/assets/userscript.js", content);
+  readAndAppendJsFile(":/assets/polyfills.js", content);
+
+  if (MainWindow::instance()->settings()->value("vencord", false).toBool()) {
+    qDebug(mainLog) << "Vencord is enabled";
+    content.append(";");
+
+    readAndAppendJsFile(":/assets/vencord/vencord.js", content);
+  }
+  injectScript("userscript.js", content);
+
+  injectFile(&DiscordPage::injectStylesheet, "style.css", ":/assets/style.css");
+  injectFile(&DiscordPage::injectStylesheet, "vencord.css",
+             ":/assets/vencord/vencord.css");
 
   setupUserStyles();
   setupArrpc();
 }
 
+void DiscordPage::readAndAppendJsFile(const QString &path, QByteArray &data) {
+  QFile file(path);
+  if (!file.open(QIODevice::ReadOnly))
+    qFatal("Failed to load file \"%s\" with error: %s",
+           path.toLatin1().constData(),
+           file.errorString().toLatin1().constData());
+
+  data.append(file.readAll());
+  file.close();
+}
+
 void DiscordPage::setupPermissions() {
   settings()->setAttribute(QWebEngineSettings::ScreenCaptureEnabled, true);
-  settings()->setAttribute(QWebEngineSettings::JavascriptCanOpenWindows, true);
   settings()->setAttribute(QWebEngineSettings::AllowRunningInsecureContent,
                            true);
   settings()->setAttribute(
@@ -152,10 +180,10 @@ void DiscordPage::injectScript(QString name, QString content) {
 }
 
 void DiscordPage::injectStylesheet(QString name, QString content) {
-  auto script = QString(R"(const stylesheet = document.createElement("style");
+  auto script = QString(R"({const stylesheet = document.createElement("style");
 stylesheet.id = "%1";
 stylesheet.innerText = `%2`;
-document.head.appendChild(stylesheet);
+document.head.appendChild(stylesheet);}
 )")
                     .arg(name)
                     .arg(content);
@@ -298,7 +326,8 @@ UserScript *DiscordPage::userScript() { return &m_userScript; }
 void DiscordPage::setupArrpc() {
   QFile nodejs("/usr/bin/node");
   if (nodejs.exists()) {
-    auto arrpcSource = QTemporaryFile::createNativeFile(":/assets/arrpc.js");
+    auto arrpcSource =
+        QTemporaryFile::createNativeFile(":/assets/arrpc/arrpc.js");
     qDebug(mainLog).noquote()
         << "NodeJS found, starting arRPC located at" << arrpcSource->fileName();
     m_arrpcProcess.setProcessChannelMode(QProcess::ForwardedChannels);
@@ -307,6 +336,6 @@ void DiscordPage::setupArrpc() {
     m_arrpcProcess.start();
 
     injectFile(&DiscordPage::injectScript, "arrpc_bridge_mod.js",
-               ":/assets/arrpc_bridge_mod.js");
+               ":/assets/arrpc/arrpc_bridge_mod.js");
   }
 }
