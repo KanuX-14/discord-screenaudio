@@ -30,7 +30,7 @@ void CentralWidget::setupWebView() {
                            ->settings()
                            ->value("useNotifySend", false)
                            .toBool();
-  if (m_useKF5Notifications || useNotifySend)
+  if (bUseQtNotificationDaemon || useNotifySend)
     QWebEngineProfile::defaultProfile()->setNotificationPresenter(
         [&](std::unique_ptr<QWebEngineNotification> notificationInfo) {
           if (useNotifySend) {
@@ -42,36 +42,7 @@ void CentralWidget::setupWebView() {
             QProcess::execute("notify-send",
                               {"--icon", image_path, "--app-name",
                                "discord-screenaudio", title, message});
-          } else if (m_useKF5Notifications) {
-#ifdef KNOTIFICATIONS
-            KNotification *notification =
-                new KNotification("discordNotification");
-            notification->setTitle(notificationInfo->title());
-            notification->setText(notificationInfo->message());
-            notification->setPixmap(
-                QPixmap::fromImage(notificationInfo->icon()));
-#ifdef QT5
-            notification->setDefaultAction("View");
-            connect(notification, &KNotification::defaultActivated,
-                    [&, notificationInfo = std::move(notificationInfo)]() {
-                      notificationInfo->click();
-                      show();
-                      activateWindow();
-                    });
-            notification->sendEvent();
-#else
-            auto action = notification->addDefaultAction("View");
-            connect(action, &KNotificationAction::activated,
-                    [&, notificationInfo = std::move(notificationInfo)]() {
-                      notificationInfo->click();
-                      show();
-                      activateWindow();
-                    });
-            notification->sendEvent();
-#endif
-#endif
-          }
-        });
+          }});
 
   connect(page->userScript(), &UserScript::loadingMessageChanged, this,
           &CentralWidget::setLoadingIndicator);

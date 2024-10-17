@@ -2,8 +2,11 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-/build
+/[B,b]uild
+
 .vscode
+
+# Custom?
 /submodules/arrpc
 /submodules/Vencord
 .cache

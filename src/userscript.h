@@ -9,22 +9,6 @@
 #include <QObject>
 #include <QProcess>
 
-#ifdef KXMLGUI
-#include <KHelpMenu>
-#include <KShortcutsDialog>
-#include <KXmlGuiWindow>
-#include <QAction>
-
-#ifdef KGLOBALACCEL
-#include <KGlobalAccel>
-#endif
-
-#endif
-
-#ifdef KNOTIFICATIONS
-#include <KNotification>
-#endif
-
 class UserScript : public QObject {
   Q_OBJECT
 
@@ -47,10 +31,10 @@ private:
   QString m_loadingMessage;
 #ifdef KXMLGUI
   KHelpMenu *m_helpMenu;
-#ifdef KGLOBALACCEL
-  KActionCollection *m_actionCollection;
-  KShortcutsDialog *m_shortcutsDialog;
-#endif
+  #ifdef KGLOBALACCEL
+    KActionCollection *m_actionCollection;
+    KShortcutsDialog *m_shortcutsDialog;
+  #endif
 #endif
   void setupHelpMenu();
   void setupShortcutsDialog();

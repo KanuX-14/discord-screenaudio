@@ -22,9 +22,9 @@ private:
   QVBoxLayout *m_layout;
   QWebEngineView *m_webView;
 #ifdef KNOTIFICATIONS
-  bool m_useKF5Notifications = true;
+  bool bUseQtNotificationDaemon = true;
 #else
-  bool m_useKF5Notifications = false;
+  bool bUseQtNotificationDaemon = false;
 #endif
   QLabel *m_loadingLabel = nullptr;
 
